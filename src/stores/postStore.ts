@@ -29,8 +29,11 @@ function saveState(key: string, state: Array<Post>) {
 export const usePostStore = defineStore('postStore', {
   // Определяем начальное состояние хранилища.
   state: () => ({
-    post: <Post>{ id: '', name: '' },
+    post: <Post>{ id: '', name: '' }, //шпблон поста
     posts: <Array<Post>>[],
+    postsForFind: <Array<Post>>[],
+    currentPage: 0,
+    pageSize: 10, // количество постов на одну порцию
   }),
   // Определяем действия, которые могут изменять состояние хранилища.
   actions: {
@@ -55,8 +58,31 @@ export const usePostStore = defineStore('postStore', {
       saveState('posts', this.posts);
     },
 
+    // ленивая загрузка
+    loadPostMore(){
+      // Вычисление индекса начала и конца для порции данных
+      const start = this.currentPage * this.pageSize;
+      const end = start + this.pageSize;
+      // Добавление новой порции постов в состояние 
+      this.posts.push.apply(this.posts, loadState('posts').slice(start, end))          
+      // Увеличение номера текущей страницы
+      this.currentPage++;
+    },
+
+    // поиск постов
+    findPost(){
+      // Вычисление индекса начала и конца для порции данных
+      const start = this.currentPage * this.pageSize;
+      const end = start + this.pageSize;
+      // Добавление новой порции постов в состояние 
+      this.posts.push.apply(this.posts, loadState('posts').slice(start, end))          
+      // Увеличение номера текущей страницы
+      this.currentPage++;
+    },
+
     // Инициализация состояния
     initialize() {
+
       const fetchData = async () => {
         console.log('fetchData')
         try {
@@ -65,19 +91,20 @@ export const usePostStore = defineStore('postStore', {
             throw new Error('Network response was not ok');
           }
           const data = await response.json();
-          this.posts = data.posts;
+              
           saveState('posts', data.posts);
+          this.loadPostMore()   
         } catch (error) {
           console.error('Error fetching data:', error);
         }
       };
 
-      // проверяем, как надо загрузить из файла или из хранилища
+      // проверяем, как надо первоначально загрузить из файла или из хранилища
       if (loadState('posts') == null) {
         fetchData()
       }
-      else {
-        postStore.posts = loadState('posts');
+      else {       
+        this.loadPostMore()      
       }
 
     },

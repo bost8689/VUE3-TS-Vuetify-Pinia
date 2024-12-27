@@ -21,12 +21,13 @@
           </v-btn>
         </v-theme-provider>
       </v-navigation-drawer>
-
-      <router-view v-slot="{ Component }">
+      
+      <router-view />
+      <!-- <router-view v-slot="{ Component }">
         <keep-alive include="index">
           <component :is="Component" />
         </keep-alive>
-      </router-view>
+      </router-view> -->
     </v-main>
 
     <v-theme-provider theme="dark" with-background class="d-md-none pb-3 pt-3 sticky-bottom">

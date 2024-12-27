@@ -1,11 +1,12 @@
 <template>
 
-  <v-container class="">    
+  <v-container class="">
     <v-text-field v-model="searchQuery" label="Поиск" append-icon="mdi-magnify" @input="filteredPosts"
       clearable></v-text-field>
+
     <v-row>
-      <v-col>      
-        <v-card  v-for="(post, index) in posts" :key="post.id" :text=post.name class="post-card">
+      <v-col>
+        <v-card v-for="(post, index) in posts" :key="post.id" :text=post.name class="post-card">
           <v-card-actions>
             <v-row class="d-flex flex-wrap">
               <v-col>
@@ -22,11 +23,19 @@
               </v-col>
             </v-row>
           </v-card-actions>
-        </v-card>      
+        </v-card>
+
+
+        <!-- <button @click="loadMorePosts">Загрузить еще</button> -->
       </v-col>
     </v-row>
+    <!-- Интерсект элемент для загрузки дополнительных постов -->
+
+    <!-- <v-intersect @intersect="loadMorePosts">
+      <div style="height: 1px;"></div>
+    </v-intersect> -->
   </v-container>
-  
+
 </template>
 <route lang="yaml">
   meta:
@@ -44,6 +53,7 @@ const searchQuery: Ref<String> = ref('')
 const postStore = usePostStore();
 const router = useRouter();
 const hover: Ref<Boolean> = ref(false)
+const isBottom: Ref<Boolean> = ref(false)
 
 // функция поиска
 const filteredPosts = computed(() => {
@@ -65,9 +75,21 @@ const goToEditPost = (post: Post) => {
 const deletePost = (post: Post) => {
   postStore.delete(post)
 }
+
+
 //монтирование компонента
 onMounted(() => {
   posts.value = postStore.posts;
+  window.addEventListener('scroll', () => {
+    // Рассчитываем, докрутили ли страницу до конца
+    const bottomOfWindow = document.documentElement.scrollTop+ 2000 + window.innerHeight >= document.documentElement.offsetHeight;
+    isBottom.value = bottomOfWindow;
+    if (bottomOfWindow) {
+      // подгружаем данные
+      postStore.loadPostMore();   
+    }
+  });
+  
 });
 
 </script>
@@ -78,7 +100,9 @@ onMounted(() => {
   transition: background-color 0.3s ease;
   transition: border-color 0.3s ease;
 }
+
 .post-card:hover {
-  border: 1px solid #3f51b5; /* Например, синяя граница */
+  border: 1px solid #3f51b5;
+  /* Например, синяя граница */
 }
 </style>
