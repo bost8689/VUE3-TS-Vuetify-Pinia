@@ -20,7 +20,7 @@
       <router-view />
     </v-main>
 
-    <v-theme-provider theme="dark" with-background class="d-flex pb-3 pt-3 sticky-bottom">
+    <v-theme-provider theme="dark" with-background class="d-md-none d-flex pb-3 pt-3 sticky-bottom">
       <v-footer app padless class="d-flex justify-end">
         <v-btn @click="toggleDrawer"><v-icon>mdi-menu</v-icon></v-btn>       
       </v-footer>
