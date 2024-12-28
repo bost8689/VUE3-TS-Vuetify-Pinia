@@ -37,10 +37,11 @@ if ('id' in route.params) {
 }
 
 // обновления поста
-const updatePost = () => {  
-  console.log('updatePost')
+const updatePost = () => {    
   postStore.update(post.value)
-  router.push({ path: `/posts` });
+  // router.push({ path: `/posts` });
+  router.go(-1);
+  
 }
 
 </script>

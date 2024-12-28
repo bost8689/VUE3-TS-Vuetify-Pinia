@@ -7,27 +7,25 @@
         <v-toolbar-title></v-toolbar-title>
       </v-app-bar>
     </v-theme-provider>
-    
+
     <v-main>
 
-      <v-navigation-drawer v-model="drawer" app class="pa-2">
-        <v-theme-provider theme="dark" with-background class="">
-          <v-btn v-if="!isRoutePosts" color="success" @click="goToPosts" block>
-            Посты
-          </v-btn>
-          <v-btn v-if="isRoutePosts" color="success" @click="goToCreatePost" block>
-            <v-icon left>mdi-plus</v-icon>
-            Добавить
-          </v-btn>
-        </v-theme-provider>
+      <v-navigation-drawer v-model="drawer" class="pa-2 fixed-drawer">
+        <v-btn v-if="!isRoutePosts" color="success" @click="goToPosts" block>
+          Посты
+        </v-btn>
+        <v-btn v-if="isRoutePosts" color="success" @click="goToCreatePost" block>
+          <v-icon left>mdi-plus</v-icon>
+          Добавить
+        </v-btn>
       </v-navigation-drawer>
-      
-      <router-view />
-      <!-- <router-view v-slot="{ Component }">
+
+      <!-- <router-view /> -->
+      <router-view v-slot="{ Component }">
         <keep-alive include="index">
           <component :is="Component" />
         </keep-alive>
-      </router-view> -->
+      </router-view>
     </v-main>
 
     <v-theme-provider theme="dark" with-background class="d-md-none pb-3 pt-3 sticky-bottom">
@@ -71,8 +69,23 @@ const isRoutePosts = computed(() => {
 
 </script>
 <style>
+
 .sticky-bottom {
   position: sticky;
   bottom: 0;
+  z-index: 1000;
+}
+
+.sticky-top {
+  z-index: 1000;
+  position: sticky;
+  top: 0;
+}
+
+.fixed-drawer {
+  position: fixed !important;
+  /* Фиксируем позицию ящика */
+  overflow: hidden;
+  /* Отключаем прокрутку */
 }
 </style>

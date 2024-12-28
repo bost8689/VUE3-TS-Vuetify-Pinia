@@ -2,7 +2,8 @@
 
   <v-container class="">
     <v-text-field v-model="searchQuery" label="Поиск" append-icon="mdi-magnify" @input="filteredPosts"
-      clearable></v-text-field>
+      clearable  
+    @click:clear="filteredPosts"></v-text-field>
 
     <v-row>
       <v-col>
@@ -52,20 +53,27 @@ const posts: Ref<Array<Post>> = ref([])
 const searchQuery: Ref<String> = ref('')
 const postStore = usePostStore();
 const router = useRouter();
-const hover: Ref<Boolean> = ref(false)
 const isBottom: Ref<Boolean> = ref(false)
 
 // функция поиска
-const filteredPosts = computed(() => {
-  if (!searchQuery.value) {
+const filteredPosts = () => {
+  // если строка пуста
+  if (!searchQuery.value) {   
+    postStore.initialize();
     posts.value = postStore.posts;
   }
   else {
-    posts.value = posts.value.filter(post =>
+    // осуществляем поиск постов из хранилища
+    postStore.searchPosts = postStore.loadState('posts').filter((post: Post) =>
       post.name.toLowerCase().includes(searchQuery.value.toLowerCase())
     );
+    // загружаем посты на фронт порциями
+    postStore.posts = [];
+    postStore.currentPage = 0;
+    postStore.loadSearchPostMore()
+    posts.value = postStore.posts    
   }
-});
+};
 
 //переход на страницу изменения поста
 const goToEditPost = (post: Post) => {
@@ -76,20 +84,25 @@ const deletePost = (post: Post) => {
   postStore.delete(post)
 }
 
-
 //монтирование компонента
 onMounted(() => {
-  posts.value = postStore.posts;
+  posts.value = postStore.posts;  
   window.addEventListener('scroll', () => {
+
     // Рассчитываем, докрутили ли страницу до конца
-    const bottomOfWindow = document.documentElement.scrollTop+ 2000 + window.innerHeight >= document.documentElement.offsetHeight;
+    const bottomOfWindow = document.documentElement.scrollTop + 2000 + window.innerHeight >= document.documentElement.offsetHeight;
     isBottom.value = bottomOfWindow;
     if (bottomOfWindow) {
-      // подгружаем данные
-      postStore.loadPostMore();   
+      // подгружаем данные      
+      if (!searchQuery.value) {
+        postStore.loadPostMore();
+      }
+      else{
+        postStore.loadSearchPostMore();
+      }
     }
   });
-  
+
 });
 
 </script>
